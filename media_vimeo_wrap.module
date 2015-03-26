@@ -1,0 +1,247 @@
+<?php
+
+/**
+ * @file
+ *
+ * Media Vimeo wrap
+ */
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ * Provides default values for the new "Media Slideshow" Formatter.
+ */
+function media_vimeo_wrap_field_formatter_info() {
+  return array(
+    'media_vimeo_wrap' => array(
+      'label' => t('Media Vimeo Wrap'),
+      'field types' => array('media'),
+      'settings' => array(
+        'width' => 480,
+        'height' => 280,
+        'color' => '009900',
+        'autoplay' => FALSE,
+        'portrait' => FALSE,
+        'title' => TRUE,
+        'byline' => FALSE,
+        'plugins' => array(
+          'carousel' => array(
+            'width' => 480,
+            'height' => 150,
+            'offsetx' => 60,
+            'offsety' => 20,
+            'visible' => 2,
+            'autoplay' => TRUE,
+            'thumb' => array(
+              'width' => 150,
+              'height' => 112,
+              'quality' => 'large',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ *
+ * Allows the user to set/check the values for the slideshow.
+ *
+ * @param $field
+ * @param $instance
+ * @param $view_mode
+ * @param array $form
+ * @param array $form_state
+ * @return array
+ */
+function media_vimeo_wrap_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $element = array();
+  $element['width'] = array(
+    '#title' => t('Video width'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['width'],
+  );
+  $element['height'] = array(
+    '#title' => t('Video Height'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['height'],
+  );
+  $element['color'] = array(
+    '#title' => t('Video color'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['color'],
+  );
+  $element['autoplay'] = array(
+    '#title' => t('Video autoplay'),
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
+    '#default_value' => $settings['autoplay'],
+  );
+  $element['portrait'] = array(
+    '#title' => t('Video portrait'),
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
+    '#default_value' => $settings['portrait'],
+  );
+  $element['title'] = array(
+    '#title' => t('Video title'),
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
+    '#default_value' => $settings['title'],
+  );
+  $element['byline'] = array(
+    '#title' => t('Video byline'),
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
+    '#default_value' => $settings['byline'],
+  );
+  $element['plugins'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Carousel settings',
+    '#collapsed' => FALSE,
+    '#collapsible' => FALSE,
+    '#tree' => TRUE,
+    'carousel' => array(
+      '#tree' => TRUE,
+      'width' => array(
+        '#title' => t('Carousel width'),
+        '#type' => 'textfield',
+        '#default_value' => $settings['plugins']['carousel']['width'],
+      ),
+      'height' => array(
+        '#title' => t('Carousel height'),
+        '#type' => 'textfield',
+        '#default_value' => $settings['plugins']['carousel']['height'],
+      ),
+      'offsetx' => array(
+        '#title' => t('Carousel offsetx'),
+        '#type' => 'textfield',
+        '#default_value' => $settings['plugins']['carousel']['offsetx'],
+      ),
+      'offsety' => array(
+        '#title' => t('Carousel offsety'),
+        '#type' => 'textfield',
+        '#default_value' => $settings['plugins']['carousel']['offsety'],
+      ),
+      'visible' => array(
+        '#title' => t('Carousel visible'),
+        '#type' => 'textfield',
+        '#default_value' => $settings['plugins']['carousel']['visible'],
+      ),
+      'autoplay' => array(
+        '#title' => t('Carousel autoplay'),
+        '#type' => 'select',
+        '#options' => array(
+          0 => t('No'),
+          1 => t('Yes'),
+        ),
+        '#default_value' => $settings['plugins']['carousel']['autoplay'],
+      ),
+      'thumb' => array(
+        '#tree' => TRUE,
+        'width' => array(
+          '#title' => t('Carousel thumbnail width'),
+          '#type' => 'textfield',
+          '#default_value' => $settings['plugins']['carousel']['thumb']['width'],
+        ),
+        'height' => array(
+          '#title' => t('Carousel thumbnail height'),
+          '#type' => 'textfield',
+          '#default_value' => $settings['plugins']['carousel']['thumb']['height'],
+        ),
+        'quality' => array(
+          '#title' => t('Carousel thumbnail quality'),
+          '#type' => 'textfield',
+          '#default_value' => $settings['plugins']['carousel']['thumb']['quality'],
+        ),
+      ),
+    ),
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ *
+ * Since there are too many options there is no point in trying to squeeze them
+ * into one line. Maybe in the future we add some info most users would love to
+ * see.
+ */
+function media_vimeo_wrap_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = '';
+  $summary = json_encode($settings);
+
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * Creates a themeable array out of the field items array.
+ */
+function media_vimeo_wrap_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, &$items, $display) {
+  if (!$items) {
+    return;
+  }
+  //kpr($display);
+  //kpr($items);
+  foreach ($items as $item) {
+    $fids[] = $item['fid'];
+  }
+  $files = file_load_multiple($fids);
+  //kpr($files);
+  foreach ($files as $file) {
+    $urls[] = file_create_url($file->uri);
+  }
+  $settings = $display['settings'];
+  $settings['once'] = 0;
+  $settings['urls'] = $urls;
+  $js_settings = array('media_vimeo_wrap' => array($field['field_name'] . '_' . $entity->type => $settings));
+
+  $urls = implode(',', $urls);
+  $output = array(
+    array(
+      '#markup' => '<div class="player" id="' . $field['field_name'] . '_' . $entity->type . '"></div>',
+      '#attached' => array(
+        'js' => array(
+          'http://luwes.co/vimeowrap.js/vimeowrap.js' => array(
+            'type' => 'external',
+            'weight' => 1
+          ),
+          'http://luwes.co/vimeowrap.js/vimeowrap.carousel.js' => array(
+            'type' => 'external',
+            'weight' => 2
+          ),
+          drupal_get_path('module', 'media_vimeo_wrap') . '/media_vimeo_wrap.js' => array(
+            'type' => 'file',
+            'weight' => 3
+          ),
+        ),
+      ),
+    ),
+  );
+  $output['#attached']['js'][] = array(
+    'data' => $js_settings,
+    'type' => 'setting'
+  );
+  return $output;
+}

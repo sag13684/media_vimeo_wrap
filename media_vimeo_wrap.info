@@ -1,0 +1,5 @@
+name = Media Vimeo Wrap
+description = Add new vimeo wrap js formatter
+core = 7.x
+dependencies[] = media
+group = Media
