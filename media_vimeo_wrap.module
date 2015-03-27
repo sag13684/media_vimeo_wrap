@@ -223,15 +223,15 @@ function media_vimeo_wrap_field_formatter_view($entity_type, $entity, $field, $i
       '#markup' => '<div class="player" id="' . $field['field_name'] . '_' . $entity->type . '"></div>',
       '#attached' => array(
         'js' => array(
-          'http://luwes.co/vimeowrap.js/vimeowrap.js' => array(
+          drupal_get_path('module', 'media_vimeo_wrap') . '/js/vimeowrap.js' => array(
             'type' => 'external',
             'weight' => 1
           ),
-          'http://luwes.co/vimeowrap.js/vimeowrap.carousel.js' => array(
+          drupal_get_path('module', 'media_vimeo_wrap') . '/js/vimeowrap.carousel.js' => array(
             'type' => 'external',
             'weight' => 2
           ),
-          drupal_get_path('module', 'media_vimeo_wrap') . '/media_vimeo_wrap.js' => array(
+          drupal_get_path('module', 'media_vimeo_wrap') . '/js/media_vimeo_wrap.js' => array(
             'type' => 'file',
             'weight' => 3
           ),

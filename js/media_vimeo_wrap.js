@@ -10,10 +10,7 @@
                 $slideshow = $(this);
                 $slideshow_id = $slideshow.attr('id');
                 $settings = Drupal.settings.media_vimeo_wrap[$slideshow_id];
-                //console.log($settings);
-                // @TDOD: investigate this bug
                 if ($settings.once == 0) {
-                    console.log(1);
                     vimeowrap($slideshow_id).setup(Drupal.settings.media_vimeo_wrap[$slideshow_id]);
                     // set flag preventing this from loading twice (caused by colorbox afaik)
                     Drupal.settings.media_vimeo_wrap[$slideshow_id].once = 1;
